@@ -23,6 +23,7 @@ def download_eels(max: int = 1000):
 
     eelsdb = requests.get('https://api.eelsdb.eu/spectra?per_page=%d' % max).json()
     for entry in eelsdb:
+        print('add %s' % entry['permalink'])
         path = entry['permalink'].strip('https://').strip('/')
         with zf.open(os.path.join(path, 'metadata.json'), mode='w') as f:
             f.write(json.dumps(entry, indent=2).encode('utf-8'))
@@ -39,4 +40,4 @@ def download_eels(max: int = 1000):
 
 
 if __name__ == '__main__':
-    download_eels(max=10)
+    download_eels()
