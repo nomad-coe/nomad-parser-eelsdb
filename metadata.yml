@@ -1,7 +1,0 @@
-code-label: 'EELSDB'
-code-label-style: 'All in capitals'
-code-url: https://eelsdb.eu/
-parser-dir-name: dependencies/parsers/eelsdb/
-parser-git-url: https://gitlab.mpcdf.mpg.de/nomad-lab/eelsdb
-parser-specific: ''
-table-of-files: ''
