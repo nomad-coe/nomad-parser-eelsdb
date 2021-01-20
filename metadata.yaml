@@ -1,7 +1,9 @@
-codeLabel: 'EELSDB'
-codeLabelStyle: 'All in capitals'
+codeLabel: EELSDB
+codeLabelStyle: All in capitals
+codeName: eelsdb
 codeUrl: https://eelsdb.eu/
 parserDirName: dependencies/parsers/eelsdb/
-parserGitUrl: https://gitlab.mpcdf.mpg.de/nomad-lab/eelsdb
+parserGitUrl: https://github.com/nomad-coe/nomad-parser-eelsdb.git
 parserSpecific: ''
+preamble: ''
 tableOfFiles: ''
