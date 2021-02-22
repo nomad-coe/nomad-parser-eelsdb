@@ -114,9 +114,7 @@ class EELSApiJsonConverter(FairdiParser):
         num_data_filepath = glob.glob(dirpath + '/*.msa')[0]
         
         df = pd.read_csv(num_data_filepath, header=None, skiprows=15, skipfooter=1, engine='python')
-        print(df.head())
-        # print(df.to_numpy()[:5])
-
+        
         numerical_value = data.m_create(NumericalValues)
         numerical_value.data_values = df.to_numpy()
 
