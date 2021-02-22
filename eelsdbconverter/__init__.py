@@ -27,6 +27,8 @@ import time
 import ast
 import logging
 import re
+import glob
+import pandas as pd
 
 from nomad.datamodel import Author
 # from nomad.datamodel.metainfo.common_experimental import (
@@ -51,7 +53,8 @@ class EELSApiJsonConverter(FairdiParser):
     def parse(self, filepath, archive, logger=logger):
         with open(filepath) as f:
             file_data = json.load(f)
-
+        print(filepath)
+        
         #Reading a measurement
         measurement = archive.m_create(Measurement)
 
@@ -106,6 +109,17 @@ class EELSApiJsonConverter(FairdiParser):
         author_generated.descriptionn = file_data['description']
 
         #Data Header
+
+        #Reading data from the msa file
+        dirpath = filepath[:filepath.rindex('/')]
+        num_data_filepath = glob.glob(dirpath + '/*.msa')[0]
+        
+        df = pd.read_csv(num_data_filepath, header=None, skiprows=15, skipfooter=1, engine='python')
+        print(df.head())
+        # print(df.to_numpy()[:5])
+
+        numerical_value = data.m_create(NumericalValues)
+        numerical_value.data_values = df.to_numpy()
 
 
 
