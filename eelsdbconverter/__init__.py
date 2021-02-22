@@ -108,7 +108,6 @@ class EELSApiJsonConverter(FairdiParser):
         author_generated.author_profile_api_url = file_data['author']['profile_api_url']
         author_generated.descriptionn = file_data['description']
 
-        #Data Header
 
         #Reading data from the msa file
         dirpath = filepath[:filepath.rindex('/')]
@@ -122,6 +121,14 @@ class EELSApiJsonConverter(FairdiParser):
         numerical_value.data_values = df.to_numpy()
 
 
+        #Populating the data header; the information isn't in the metainfo file
+        #Data Header
+        for i in range(len(df.columns)):
+            if i==0:
+                data_header.label = "Energy"
+            elif i==1:
+                data_header.label = "Counts"
+        
 
         # experiment = archive.m_create(Experiment)
         # experiment.raw_metadata = data
