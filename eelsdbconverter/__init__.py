@@ -69,11 +69,11 @@ class EELSApiJsonConverter(FairdiParser):
         #Load entries into each above hierarchical structure
         #Sample
         sample.formula = file_data['formula']
-        # elements = file_data.get('elements')
-        # if elements is not None:
-        #     if isinstance(elements, str):
-        #         elements = json.loads(elements)
-        #     sample.elements = elements
+        elements = file_data.get('elements')
+        if elements is not None:
+            if isinstance(elements, str):
+                elements = json.loads(elements)
+            sample.elements = elements
 
         #Experiment
         experiment.method_name = 'electron energy loss spectroscopy'
@@ -106,7 +106,7 @@ class EELSApiJsonConverter(FairdiParser):
         author_generated.descriptionn = file_data['description']
 
         #Data Header
-        
+
 
 
         # experiment = archive.m_create(Experiment)

@@ -39,7 +39,7 @@ class DeviceSettings(MSection):
 
 class Sample(MSection):
     formula = Quantity(type=str)
-    elements = Quantity(type=str)
+    elements = Quantity(type=str, shape=['*'])
 
 class Experiment(MSection):
     method_name = Quantity(type=str)
