@@ -29,8 +29,9 @@ import logging
 import re
 
 from nomad.datamodel import Author
-from nomad.datamodel.metainfo.common_experimental import (
-    Experiment, Sample, Method, Data, Material)
+# from nomad.datamodel.metainfo.common_experimental import (
+    # Experiment, Sample, Method, Data, Material)
+from .metainfo import *
 
 from nomad.parsing.parser import FairdiParser
 
@@ -49,60 +50,84 @@ class EELSApiJsonConverter(FairdiParser):
 
     def parse(self, filepath, archive, logger=logger):
         with open(filepath) as f:
-            data = json.load(f)
+            file_data = json.load(f)
 
-        experiment = archive.m_create(Experiment)
-        experiment.raw_metadata = data
+        #Reading a measurement
+        measurement = archive.m_create(Measurement)
 
-        experiment.experiment_publish_time = datetime.strptime(
-            data.get('published'), '%Y-%m-%d %H:%M:%S')
+        #Create the hierarchical structure
+        metadata = measurement.m_create(Metadata)
+        data = measurement.m_create(Data)
 
-        sample = experiment.m_create(Sample)
-        material = sample.m_create(Material)
-        material.chemical_formula = data.get('formula')
-        elements = data.get('elements')
+        # Create the hierarchical structure inside metadata
+        sample = metadata.m_create(Sample)
+        experiment = metadata.m_create(Experiment)
+        instrument = metadata.m_create(Instrument)
+        data_header = metadata.m_create(DataHeader)
+        author_generated = metadata.m_create(AuthorGenerated)
+
+        #Load entries into each above hierarchical structure
+        #Sample
+        sample.formula = file_data['formula']
+        elements = file_data.get('elements')
         if elements is not None:
             if isinstance(elements, str):
                 elements = json.loads(elements)
-            material.atom_labels = elements
-        material.chemical_name = data.get('title')
+            sample.elements = elements
+        
 
-        experiment.m_create(
-            Method,
-            data_type='spectrum',
-            method_name='electron energy loss spectroscopy',
-            method_abbreviation='EELS')
+        # experiment = archive.m_create(Experiment)
+        # experiment.raw_metadata = data
 
-        section_data = experiment.m_create(Data)
+        # experiment.experiment_publish_time = datetime.strptime(
+        #     data.get('published'), '%Y-%m-%d %H:%M:%S')
 
-        archive.section_metadata.external_id = str(data.get('id'))
-        archive.section_metadata.external_db = 'EELSDB'
+        # sample = experiment.m_create(Sample)
+        # material = sample.m_create(Material)
+        # material.chemical_formula = data.get('formula')
+        # elements = data.get('elements')
+        # if elements is not None:
+        #     if isinstance(elements, str):
+        #         elements = json.loads(elements)
+        #     material.atom_labels = elements
+        # material.chemical_name = data.get('title')
 
-        author = data.get('author')['name']
-        author = re.sub(r'\(.*\)', '', author).strip()
-        archive.section_metadata.coauthors = [Author(
-            first_name=' '.join(author.split(' ')[0:-1]),
-            last_name=author.split(' ')[-1])]
-        archive.section_metadata.comment = data.get('description')
-        archive.section_metadata.references = [
-            data.get('permalink'),
-            data.get('api_permalink'),
-            data.get('download_link')
-        ]
+        # experiment.m_create(
+        #     Method,
+        #     data_type='spectrum',
+        #     method_name='electron energy loss spectroscopy',
+        #     method_abbreviation='EELS')
 
-        reference = data.get('reference')
-        if reference:
-            if isinstance(reference, str):
-                archive.section_metadata.references.append(reference)
-            elif isinstance(reference, dict):
-                if 'freetext' in reference:
-                    archive.section_metadata.references.append(
-                        re.sub(r'\r+\n+', '; ', reference['freetext']))
-                else:
-                    archive.section_metadata.references.append('; '.join([
-                        str(value).strip() for value in reference.values()
-                    ]))
+        # section_data = experiment.m_create(Data)
 
-        section_data.repository_name = 'Electron Energy Loss Spectroscopy (EELS) database'
-        section_data.repository_url = 'https://eelsdb.eu'
-        section_data.entry_repository_url = data.get('permalink')
+        # archive.section_metadata.external_id = str(data.get('id'))
+        # archive.section_metadata.external_db = 'EELSDB'
+
+        # author = data.get('author')['name']
+        # author = re.sub(r'\(.*\)', '', author).strip()
+        # archive.section_metadata.coauthors = [Author(
+        #     first_name=' '.join(author.split(' ')[0:-1]),
+        #     last_name=author.split(' ')[-1])]
+        # archive.section_metadata.comment = data.get('description')
+        # archive.section_metadata.references = [
+        #     data.get('permalink'),
+        #     data.get('api_permalink'),
+        #     data.get('download_link')
+        # ]
+
+        # reference = data.get('reference')
+        # if reference:
+        #     if isinstance(reference, str):
+        #         archive.section_metadata.references.append(reference)
+        #     elif isinstance(reference, dict):
+        #         if 'freetext' in reference:
+        #             archive.section_metadata.references.append(
+        #                 re.sub(r'\r+\n+', '; ', reference['freetext']))
+        #         else:
+        #             archive.section_metadata.references.append('; '.join([
+        #                 str(value).strip() for value in reference.values()
+        #             ]))
+
+        # section_data.repository_name = 'Electron Energy Loss Spectroscopy (EELS) database'
+        # section_data.repository_url = 'https://eelsdb.eu'
+        # section_data.entry_repository_url = data.get('permalink')
