@@ -66,7 +66,7 @@ class EELSApiJsonConverter(FairdiParser):
         sample = metadata.m_create(Sample)
         experiment = metadata.m_create(Experiment)
         instrument = metadata.m_create(Instrument)
-        data_header = metadata.m_create(DataHeader)
+        # data_header = metadata.m_create(DataHeader)
         author_generated = metadata.m_create(AuthorGenerated)
 
         #Load entries into each above hierarchical structure
@@ -121,7 +121,9 @@ class EELSApiJsonConverter(FairdiParser):
 
         #Populating the data header; the information isn't in the metainfo file
         #Data Header
+        
         for i in range(len(df.columns)):
+            data_header = metadata.m_create(DataHeader)
             if i==0:
                 data_header.label = "Energy"
             elif i==1:
