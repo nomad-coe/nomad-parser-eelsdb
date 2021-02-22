@@ -39,13 +39,14 @@ class DeviceSettings(MSection):
 
 class Sample(MSection):
     formula = Quantity(type=str)
-    elements = Quantity(type=list)
+    elements = Quantity(type=str)
 
 class Experiment(MSection):
-    method_type = Quantity(type=str)
+    method_name = Quantity(type=str)
+    method_abbreviation = Quantity(type=str)
     experiment_publish_time = Quantity(
         type=Datetime, description='The datetime when this experiment was published.')
-    experiment_time = Quantity(
+    experiment_start_time = Quantity(
         type=Datetime, description='The datetime of the beginning of the experiment.')
     experiment_end_time = Quantity(
         type=Datetime, description='The datetime of the experiment end.')
@@ -63,7 +64,6 @@ class AuthorGenerated(MSection):
     author_profile_url = Quantity(type=str)
     author_profile_api_url = Quantity(type=str)
 
-    published = Quantity(type=str)
     description = Quantity(type=str)
 
     group_name = Quantity(type=str)

@@ -69,12 +69,45 @@ class EELSApiJsonConverter(FairdiParser):
         #Load entries into each above hierarchical structure
         #Sample
         sample.formula = file_data['formula']
-        elements = file_data.get('elements')
-        if elements is not None:
-            if isinstance(elements, str):
-                elements = json.loads(elements)
-            sample.elements = elements
+        # elements = file_data.get('elements')
+        # if elements is not None:
+        #     if isinstance(elements, str):
+        #         elements = json.loads(elements)
+        #     sample.elements = elements
+
+        #Experiment
+        experiment.method_name = 'electron energy loss spectroscopy'
+        experiment.method_abbreviation = 'EELS'
+        experiment.experiment_publish_time = datetime.strptime(
+            file_data.get('published'), '%Y-%m-%d %H:%M:%S')
         
+        #Instrument
+        instrument.source_label = file_data['microscope']
+        device_settings = instrument.m_create(DeviceSettings)
+        device_settings.device_name = file_data['microscope']
+        device_settings.max_energy = file_data['max_energy']
+        device_settings.min_energy = file_data['min_energy']
+        device_settings.guntype = file_data['guntype']
+        device_settings.beam_energy = file_data['beamenergy']
+        device_settings.resolution = file_data['resolution']
+        device_settings.step_size = file_data['stepSize']
+        device_settings.acquisition_mode = file_data['acquisition_mode']
+        device_settings.beam_current = file_data['beamcurrent']
+        device_settings.detector_type = file_data['detector']
+        device_settings.dark_current = file_data['darkcurrent']
+
+        #Author Generated
+        author_generated.sample_id = str(file_data['id'])
+        author_generated.sample_title = file_data['title']
+        author_generated.permalink = file_data['permalink']
+        author_generated.author_name = file_data['author']['name']
+        author_generated.author_profile_url = file_data['author']['profile_url']
+        author_generated.author_profile_api_url = file_data['author']['profile_api_url']
+        author_generated.descriptionn = file_data['description']
+
+        #Data Header
+        
+
 
         # experiment = archive.m_create(Experiment)
         # experiment.raw_metadata = data
