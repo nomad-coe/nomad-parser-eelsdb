@@ -26,7 +26,6 @@ class DeviceSettings(MSection):
     device_name = Quantity(type=str)
     max_energy = Quantity(type=str)
     min_energy = Quantity(type=str)
-    edges = Quantity(type=str, shape = ['*'])
     guntype = Quantity(type=str)
     beam_energy = Quantity(type=str)
     resolution = Quantity(type=str)
@@ -53,6 +52,7 @@ class Experiment(MSection):
         type=Datetime, description='The datetime of the beginning of the experiment.')
     experiment_end_time = Quantity(
         type=Datetime, description='The datetime of the experiment end.')
+    edges = Quantity(type=str, shape = ['*'])
 
 
 class Instrument(MSection):

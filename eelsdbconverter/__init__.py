@@ -113,7 +113,12 @@ class EELSApiJsonConverter(FairdiParser):
         experiment.method_abbreviation = 'EELS'
         experiment.experiment_publish_time = datetime.strptime(
             file_data.get('published'), '%Y-%m-%d %H:%M:%S')
-        
+        edges = file_data.get('edges')
+        if edges is not None:
+            if isinstance(edges, str):
+                edges = json.loads(edges)
+            experiment.edges = edges
+
         #Instrument
         instrument = metadata.m_create(Instrument)
         instrument.source_label = file_data['microscope']
@@ -129,11 +134,7 @@ class EELSApiJsonConverter(FairdiParser):
         device_settings.beam_current = file_data['beamcurrent']
         device_settings.detector_type = file_data['detector']
         device_settings.dark_current = file_data['darkcurrent']
-        edges = file_data.get('edges')
-        if edges is not None:
-            if isinstance(edges, str):
-                edges = json.loads(edges)
-            device_settings.edges = edges
+        
 
         #Author Generated
         author_generated = metadata.m_create(AuthorGenerated)
