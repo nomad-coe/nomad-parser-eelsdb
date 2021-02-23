@@ -64,13 +64,15 @@ class EELSApiJsonConverter(FairdiParser):
         data = measurement.m_create(Data)
 
         #Check that the msa file exists
+        
         dirpath = filepath[:filepath.rindex('/')]
         if os.path.exists(dirpath):
             for i in os.listdir(dirpath):
                 if i.endswith('.msa'):
-                    data_file_path = dirpath + '/' + i
+                    data_file_path = os.path.join(dirpath, i)
         
-        #Read data from the msa file
+        #Read header from the msa file
+        # with open()
         
         df = pd.read_csv(data_file_path, header=None, skiprows=15, skipfooter=1, engine='python')
         
