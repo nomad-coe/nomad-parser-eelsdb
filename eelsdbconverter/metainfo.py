@@ -70,7 +70,7 @@ class AuthorGenerated(MSection):
     group_name = Quantity(type=str)
 
 class DataHeader(MSection):
-    channel_id = Quantity(type=str)
+    # channel_id = Quantity(type=str)
     label = Quantity(type=str)
     unit = Quantity(type=str)
 

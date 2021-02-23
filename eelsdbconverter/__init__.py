@@ -77,16 +77,32 @@ class EELSApiJsonConverter(FairdiParser):
                 skip_row_counter += 1
                 header_data_file.append(previous_line.strip().lstrip('#').split())
         
+        #Extract units from the header file
+        for item in header_data_file:
+            if item[0].lower() == 'xunits':
+                if item[-1] != ':':
+                    x_units = item[-1]
+                else:
+                    x_units = ' '
+            if item[0].lower() == 'yunits':
+                if item[-1] != ':':
+                    y_units = item[-1]
+                else:
+                    y_units = ' '
+
         #Read the dataset from the msa file
         df = pd.read_csv(data_file_path, header=None, skiprows=skip_row_counter, skipfooter=1, engine='python')
         
         #Export the dataset to the archive
         # numerical_value = data.m_create(NumericalValues)
         # numerical_value.data_values = df.to_numpy()
+        ureg = pint.UnitRegistry()
+        Q_ = ureg.Quantity
+
         spectrum = data.m_create(Spectrum)
         spectrum.n_values = len(df)
-        spectrum.energy = df[0]
-        spectrum.count = df[1]
+        spectrum.energy = Q_(df[0].to_numpy(), x_units)
+        spectrum.count = Q_(df[1].to_numpy(), y_units)
 
         """
         Create metadata schematic and import values
@@ -154,8 +170,10 @@ class EELSApiJsonConverter(FairdiParser):
             data_header = metadata.m_create(DataHeader)
             if i==0:
                 data_header.label = "Energy"
+                data_header.unit = x_units
             elif i==1:
                 data_header.label = "Counts"
+                data_header.unit = y_units
         
 
         # experiment = archive.m_create(Experiment)
