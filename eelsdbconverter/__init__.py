@@ -19,6 +19,7 @@
 
 import sys
 import os.path
+import os
 import json
 import ase
 import numpy as np
@@ -53,14 +54,33 @@ class EELSApiJsonConverter(FairdiParser):
     def parse(self, filepath, archive, logger=logger):
         with open(filepath) as f:
             file_data = json.load(f)
-        print(filepath)
         
-        #Reading a measurement
+        #Create a measurement in the archive
         measurement = archive.m_create(Measurement)
+
+        """
+        Read (numerical) dataset into the measurement
+        """
+        data = measurement.m_create(Data)
+
+        #Check that the msa file exists
+        dirpath = filepath[:filepath.rindex('/')]
+        if os.path.exists(dirpath):
+            for i in os.listdir(dirpath):
+                if i.endswith('.msa'):
+                    data_file_path = dirpath + '/' + i
+        
+        #Read data from the msa file
+        
+        df = pd.read_csv(data_file_path, header=None, skiprows=15, skipfooter=1, engine='python')
+        
+        numerical_value = data.m_create(NumericalValues)
+        numerical_value.data_values = df.to_numpy()
+
+
 
         #Create the hierarchical structure
         metadata = measurement.m_create(Metadata)
-        data = measurement.m_create(Data)
 
         # Create the hierarchical structure inside metadata
         sample = metadata.m_create(Sample)
@@ -109,15 +129,7 @@ class EELSApiJsonConverter(FairdiParser):
         author_generated.descriptionn = file_data['description']
 
 
-        #Reading data from the msa file
-        dirpath = filepath[:filepath.rindex('/')]
-        num_data_filepath = glob.glob(dirpath + '/*.msa')[0]
         
-        df = pd.read_csv(num_data_filepath, header=None, skiprows=15, skipfooter=1, engine='python')
-        
-        numerical_value = data.m_create(NumericalValues)
-        numerical_value.data_values = df.to_numpy()
-
 
         #Populating the data header; the information isn't in the metainfo file
         #Data Header
