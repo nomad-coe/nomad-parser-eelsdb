@@ -17,18 +17,12 @@
 # limitations under the License.
 #
 
-import sys
 import os.path
 import os
 import json
-import ase
 import numpy as np
 from datetime import datetime
-import time
-import ast
 import logging
-import re
-import glob
 import pandas as pd
 
 from nomad.datamodel import Author
@@ -86,8 +80,12 @@ class EELSApiJsonConverter(FairdiParser):
         df = pd.read_csv(data_file_path, header=None, skiprows=skip_row_counter, skipfooter=1, engine='python')
         
         #Export the dataset to the archive
-        numerical_value = data.m_create(NumericalValues)
-        numerical_value.data_values = df.to_numpy()
+        # numerical_value = data.m_create(NumericalValues)
+        # numerical_value.data_values = df.to_numpy()
+        spectrum = data.m_create(Spectrum)
+        spectrum.n_values = len(df)
+        spectrum.energy = df[0]
+        spectrum.count = df[1]
 
         """
         Create metadata schematic and import values
