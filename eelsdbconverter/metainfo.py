@@ -26,7 +26,7 @@ class DeviceSettings(MSection):
     device_name = Quantity(type=str)
     max_energy = Quantity(type=str)
     min_energy = Quantity(type=str)
-    # edges = Quantity(type=list, shape = ['*'])
+    edges = Quantity(type=str, shape = ['*'])
     guntype = Quantity(type=str)
     beam_energy = Quantity(type=str)
     resolution = Quantity(type=str)
@@ -38,12 +38,15 @@ class DeviceSettings(MSection):
 
 
 class Sample(MSection):
+    sample_id = Quantity(type=str)
+    sample_title = Quantity(type=str)
     formula = Quantity(type=str)
     elements = Quantity(type=str, shape=['*'])
 
 class Experiment(MSection):
     method_name = Quantity(type=str)
     method_abbreviation = Quantity(type=str)
+    experiment_id = Quantity(type=str)
     experiment_publish_time = Quantity(
         type=Datetime, description='The datetime when this experiment was published.')
     experiment_start_time = Quantity(
@@ -57,8 +60,6 @@ class Instrument(MSection):
     section_device_settings = SubSection(sub_section=DeviceSettings, repeats=True)
 
 class AuthorGenerated(MSection):
-    sample_id = Quantity(type=str)
-    sample_title = Quantity(type=str)
     permalink = Quantity(type=str)
     author_name = Quantity(type=str)
     author_profile_url = Quantity(type=str)
@@ -67,7 +68,6 @@ class AuthorGenerated(MSection):
     description = Quantity(type=str)
 
     group_name = Quantity(type=str)
-    experiment_id = Quantity(type=str)
 
 class DataHeader(MSection):
     channel_id = Quantity(type=str)

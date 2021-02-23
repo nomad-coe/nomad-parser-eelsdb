@@ -82,24 +82,26 @@ class EELSApiJsonConverter(FairdiParser):
                 skip_row_counter += 1
                 header_data_file.append(previous_line.strip().lstrip('#').split())
         
+        #Read the dataset from the msa file
         df = pd.read_csv(data_file_path, header=None, skiprows=skip_row_counter, skipfooter=1, engine='python')
         
+        #Export the dataset to the archive
         numerical_value = data.m_create(NumericalValues)
         numerical_value.data_values = df.to_numpy()
 
-        #Create the hierarchical structure
+        """
+        Create metadata schematic and import values
+        """
         metadata = measurement.m_create(Metadata)
 
-        # Create the hierarchical structure inside metadata
-        sample = metadata.m_create(Sample)
-        experiment = metadata.m_create(Experiment)
-        instrument = metadata.m_create(Instrument)
-        # data_header = metadata.m_create(DataHeader)
-        author_generated = metadata.m_create(AuthorGenerated)
-
-        #Load entries into each above hierarchical structure
+        #Load entries into each heading
         #Sample
+        sample = metadata.m_create(Sample)
+
         sample.formula = file_data['formula']
+        sample.sample_id = str(file_data['id'])
+        sample.sample_title = file_data['title']
+
         elements = file_data.get('elements')
         if elements is not None:
             if isinstance(elements, str):
@@ -107,12 +109,14 @@ class EELSApiJsonConverter(FairdiParser):
             sample.elements = elements
 
         #Experiment
+        experiment = metadata.m_create(Experiment)
         experiment.method_name = 'electron energy loss spectroscopy'
         experiment.method_abbreviation = 'EELS'
         experiment.experiment_publish_time = datetime.strptime(
             file_data.get('published'), '%Y-%m-%d %H:%M:%S')
         
         #Instrument
+        instrument = metadata.m_create(Instrument)
         instrument.source_label = file_data['microscope']
         device_settings = instrument.m_create(DeviceSettings)
         device_settings.device_name = file_data['microscope']
@@ -126,10 +130,14 @@ class EELSApiJsonConverter(FairdiParser):
         device_settings.beam_current = file_data['beamcurrent']
         device_settings.detector_type = file_data['detector']
         device_settings.dark_current = file_data['darkcurrent']
+        edges = file_data.get('edges')
+        if edges is not None:
+            if isinstance(edges, str):
+                edges = json.loads(edges)
+            device_settings.edges = edges
 
         #Author Generated
-        author_generated.sample_id = str(file_data['id'])
-        author_generated.sample_title = file_data['title']
+        author_generated = metadata.m_create(AuthorGenerated)
         author_generated.permalink = file_data['permalink']
         author_generated.author_name = file_data['author']['name']
         author_generated.author_profile_url = file_data['author']['profile_url']
