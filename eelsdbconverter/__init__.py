@@ -72,14 +72,20 @@ class EELSApiJsonConverter(FairdiParser):
                     data_file_path = os.path.join(dirpath, i)
         
         #Read header from the msa file
-        # with open()
+        with open(data_file_path, 'rt') as f:
+            line = f.readline()
+            skip_row_counter = 0
+            header_data_file = []
+            while line.startswith('#'):
+                previous_line = line
+                line = f.readline()
+                skip_row_counter += 1
+                header_data_file.append(previous_line.strip().lstrip('#').split())
         
-        df = pd.read_csv(data_file_path, header=None, skiprows=15, skipfooter=1, engine='python')
+        df = pd.read_csv(data_file_path, header=None, skiprows=skip_row_counter, skipfooter=1, engine='python')
         
         numerical_value = data.m_create(NumericalValues)
         numerical_value.data_values = df.to_numpy()
-
-
 
         #Create the hierarchical structure
         metadata = measurement.m_create(Metadata)
