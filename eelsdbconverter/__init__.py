@@ -24,6 +24,7 @@ import numpy as np
 from datetime import datetime
 import logging
 import pandas as pd
+import pint
 
 from nomad.datamodel import Author
 # from nomad.datamodel.metainfo.common_experimental import (
