@@ -58,7 +58,7 @@ class EELSApiJsonConverter(FairdiParser):
         for i in os.listdir(dirpath):
             if i.endswith('.msa'):
                 dataset_filepath = os.path.join(dirpath, i)
-        
+
         if dataset_filepath in locals():
             data = measurement.m_create(Data)
             # Read header of the dataset(msa file)
