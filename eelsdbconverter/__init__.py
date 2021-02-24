@@ -153,8 +153,20 @@ class EELSApiJsonConverter(FairdiParser):
 
         # Author Generated
         author_generated = metadata.m_create(AuthorGenerated)
-        author_generated.permalink = file_data['permalink']
         author_generated.author_name = file_data['author']['name']
         author_generated.author_profile_url = file_data['author']['profile_url']
         author_generated.author_profile_api_url = file_data['author']['profile_api_url']
         author_generated.descriptionn = file_data['description']
+
+        # Origin
+        origin = metadata.m_create(Origin)
+        origin.permalink = file_data['permalink']
+        origin.api_permalink = file_data['api_permalink']
+        if file_data.get('repository_name') is not None:
+            origin.repository_name = file_data['repository_name']
+        if file_data.get('repository_url') is not None:
+            origin.repository_url = file_data['repository_url']
+        if file_data.get('preview_url') is not None:
+            origin.preview_url = file_data['preview_url']
+        if file_data.get('entry_repository_url') is not None:
+            origin.entry_repository_url = file_data['entry_repository_url']

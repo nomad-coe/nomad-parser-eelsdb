@@ -78,6 +78,7 @@ class DataHeader(MSection):
 
 class Origin(MSection):
     permalink = Quantity(type=str)
+    api_permalink = Quantity(type=str)
     repository_name = Quantity(
         type=str, description='The name of the repository, where the data is stored.')
 
