@@ -69,6 +69,17 @@ class AuthorGenerated(MSection):
     author_profile_api_url = Quantity(type=str)
     description = Quantity(type=str)
     group_name = Quantity(type=str)
+    repository_name = Quantity(
+        type=str, description='The name of the repository, where the data is stored.')
+
+    repository_url = Quantity(
+        type=str, description='An URL to the repository, where the data is stored.')
+
+    preview_url = Quantity(
+        type=str, description='An URL to an image file that contains a preview.')
+
+    entry_repository_url = Quantity(
+        type=str, description='An URL to the entry on the repository, where the data is stored.')
 
 
 class DataHeader(MSection):
@@ -92,18 +103,6 @@ class Metadata(MSection):
 
 
 class Data(MSection):
-    repository_name = Quantity(
-        type=str, description='The name of the repository, where the data is stored.')
-
-    repository_url = Quantity(
-        type=str, description='An URL to the repository, where the data is stored.')
-
-    preview_url = Quantity(
-        type=str, description='An URL to an image file that contains a preview.')
-
-    entry_repository_url = Quantity(
-        type=str, description='An URL to the entry on the repository, where the data is stored.')
-
     section_spectrum = SubSection(sub_section=Spectrum, repeats=True)
 
 
