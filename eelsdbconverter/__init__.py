@@ -45,9 +45,8 @@ class EELSApiJsonConverter(FairdiParser):
     def parse(self, filepath, archive, logger=logger):
         with open(filepath) as f:
             file_data = json.load(f)
-        
-        
-        #Create a measurement in the archive
+
+        # Create a measurement in the archive
         measurement = archive.m_create(Measurement)
 
         """
@@ -55,14 +54,14 @@ class EELSApiJsonConverter(FairdiParser):
         """
         data = measurement.m_create(Data)
 
-        #Check that the msa file exists
-        
+        # Check that the msa file exists
+
         dirpath = os.path.dirname(filepath)
         for i in os.listdir(dirpath):
             if i.endswith('.msa'):
                 dataset_filepath = os.path.join(dirpath, i)
-            
-        #Read header of the dataset(msa file)
+
+        # Read header of the dataset(msa file)
         with open(dataset_filepath, 'rt') as f:
             line = f.readline()
             skip_row_counter = 0
@@ -71,26 +70,19 @@ class EELSApiJsonConverter(FairdiParser):
                 header_dataset.append(line.strip().lstrip('#').split())
                 line = f.readline()
                 skip_row_counter += 1
-        
-        #Extract units from the header of the dataset file
+
+        # Extract units from the header of the dataset file
         for item in header_dataset:
             if item[0].lower() == 'xunits':
                 if item[-1] != ':':
                     x_units = item[-1]
                 else:
                     x_units = ' '
-            # if item[0].lower() == 'yunits':
-            #     if item[-1] != ':':
-            #         y_units = item[-1]
-            #     else:
-            #         y_units = ' '
 
-        #Read the dataset from the msa file
+        # Read the dataset from the msa file
         df = pd.read_csv(dataset_filepath, header=None, skiprows=skip_row_counter, skipfooter=1, engine='python')
-        
-        #Export the dataset to the archive
-        # numerical_value = data.m_create(NumericalValues)
-        # numerical_value.data_values = df.to_numpy()
+
+        # Export the dataset to the archive
         ureg = nomad.units.ureg
 
         spectrum = data.m_create(Spectrum)
@@ -103,8 +95,8 @@ class EELSApiJsonConverter(FairdiParser):
         """
         metadata = measurement.m_create(Metadata)
 
-        #Load entries into each heading
-        #Sample
+        # Load entries into each heading
+        # Sample
         sample = metadata.m_create(Sample)
 
         sample.formula = file_data['formula']
@@ -117,7 +109,7 @@ class EELSApiJsonConverter(FairdiParser):
                 elements = json.loads(elements)
             sample.elements = elements
 
-        #Experiment
+        # Experiment
         experiment = metadata.m_create(Experiment)
         experiment.method_name = 'electron energy loss spectroscopy'
         experiment.method_abbreviation = 'EELS'
@@ -129,7 +121,7 @@ class EELSApiJsonConverter(FairdiParser):
                 edges = json.loads(edges)
             experiment.edges = edges
 
-        #Instrument
+        # Instrument
         instrument = metadata.m_create(Instrument)
         instrument.source_label = file_data['microscope']
         device_settings = instrument.m_create(DeviceSettings)
@@ -144,8 +136,8 @@ class EELSApiJsonConverter(FairdiParser):
         device_settings.beam_current = file_data['beamcurrent']
         device_settings.detector_type = file_data['detector']
         device_settings.dark_current = file_data['darkcurrent']
-        
-        #Author Generated
+
+        # Author Generated
         author_generated = metadata.m_create(AuthorGenerated)
         author_generated.permalink = file_data['permalink']
         author_generated.author_name = file_data['author']['name']
