@@ -148,7 +148,6 @@ class EELSApiJsonConverter(FairdiParser):
         device_settings.detector_type = file_data['detector']
         device_settings.dark_current = file_data['darkcurrent']
         
-
         #Author Generated
         author_generated = metadata.m_create(AuthorGenerated)
         author_generated.permalink = file_data['permalink']
