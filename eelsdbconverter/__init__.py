@@ -52,43 +52,43 @@ class EELSApiJsonConverter(FairdiParser):
         """
         Read (numerical) dataset into the measurement
         """
-        data = measurement.m_create(Data)
-
         # Check that the msa file exists
 
         dirpath = os.path.dirname(filepath)
         for i in os.listdir(dirpath):
             if i.endswith('.msa'):
                 dataset_filepath = os.path.join(dirpath, i)
-
-        # Read header of the dataset(msa file)
-        with open(dataset_filepath, 'rt') as f:
-            line = f.readline()
-            skip_row_counter = 0
-            header_dataset = []
-            while line.startswith('#'):
-                header_dataset.append(line.strip().lstrip('#').split())
+        
+        if dataset_filepath in locals():
+            data = measurement.m_create(Data)
+            # Read header of the dataset(msa file)
+            with open(dataset_filepath, 'rt') as f:
                 line = f.readline()
-                skip_row_counter += 1
+                skip_row_counter = 0
+                header_dataset = []
+                while line.startswith('#'):
+                    header_dataset.append(line.strip().lstrip('#').split())
+                    line = f.readline()
+                    skip_row_counter += 1
 
-        # Extract units from the header of the dataset file
-        for item in header_dataset:
-            if item[0].lower() == 'xunits':
-                if item[-1] != ':':
-                    x_units = item[-1]
-                else:
-                    x_units = ' '
+            # Extract units from the header of the dataset file
+            for item in header_dataset:
+                if item[0].lower() == 'xunits':
+                    if item[-1] != ':':
+                        x_units = item[-1]
+                    else:
+                        x_units = ' '
 
-        # Read the dataset from the msa file
-        df = pd.read_csv(dataset_filepath, header=None, skiprows=skip_row_counter, skipfooter=1, engine='python')
+            # Read the dataset from the msa file
+            df = pd.read_csv(dataset_filepath, header=None, skiprows=skip_row_counter, skipfooter=1, engine='python')
 
-        # Export the dataset to the archive
-        ureg = nomad.units.ureg
+            # Export the dataset to the archive
+            ureg = nomad.units.ureg
 
-        spectrum = data.m_create(Spectrum)
-        spectrum.n_values = len(df)
-        spectrum.energy = df[0].to_numpy() * ureg(x_units)
-        spectrum.count = df[1].to_numpy()
+            spectrum = data.m_create(Spectrum)
+            spectrum.n_values = len(df)
+            spectrum.energy = df[0].to_numpy() * ureg(x_units)
+            spectrum.count = df[1].to_numpy()
 
         """
         Create metadata schematic and import values
