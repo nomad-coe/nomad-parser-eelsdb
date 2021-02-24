@@ -59,7 +59,7 @@ class EELSApiJsonConverter(FairdiParser):
             if i.endswith('.msa'):
                 dataset_filepath = os.path.join(dirpath, i)
 
-        if dataset_filepath in locals():
+        if dataset_filepath is not None:
             data = measurement.m_create(Data)
             # Read header of the dataset(msa file)
             with open(dataset_filepath, 'rt') as f:
@@ -76,11 +76,14 @@ class EELSApiJsonConverter(FairdiParser):
                 if item[0].lower() == 'xunits':
                     if item[-1] != ':':
                         x_units = item[-1]
+                        print(x_units)
                     else:
                         x_units = ' '
 
             # Read the dataset from the msa file
-            df = pd.read_csv(dataset_filepath, header=None, skiprows=skip_row_counter, skipfooter=1, engine='python')
+            df = pd.read_csv(dataset_filepath,
+                             header=None, skiprows=skip_row_counter,
+                             skipfooter=1, engine='python', sep="\t| |,")
 
             # Export the dataset to the archive
             ureg = nomad.units.ureg
@@ -127,13 +130,17 @@ class EELSApiJsonConverter(FairdiParser):
         device_settings = instrument.m_create(DeviceSettings)
         device_settings.device_name = file_data['microscope']
         device_settings.max_energy = file_data['max_energy']
-        device_settings.min_energy = file_data['min_energy']
+        if file_data.get('min_energy') is not None:
+            device_settings.min_energy = file_data['min_energy']
         device_settings.guntype = file_data['guntype']
         device_settings.beam_energy = file_data['beamenergy']
-        device_settings.resolution = file_data['resolution']
+        if file_data.get('resolution') is not None:
+            device_settings.resolution = file_data['resolution']
         device_settings.step_size = file_data['stepSize']
-        device_settings.acquisition_mode = file_data['acquisition_mode']
-        device_settings.beam_current = file_data['beamcurrent']
+        if file_data.get('acquisition_mode') is not None:
+            device_settings.acquisition_mode = file_data['acquisition_mode']
+        if file_data.get('beamcurrent') is not None:
+            device_settings.beam_current = file_data['beamcurrent']
         device_settings.detector_type = file_data['detector']
         device_settings.dark_current = file_data['darkcurrent']
 
