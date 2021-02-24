@@ -26,11 +26,7 @@ import logging
 import pandas as pd
 import nomad.units
 
-from nomad.datamodel import Author
-# from nomad.datamodel.metainfo.common_experimental import (
-    # Experiment, Sample, Method, Data, Material)
 from .metainfo import *
-
 from nomad.parsing.parser import FairdiParser
 
 
@@ -49,6 +45,7 @@ class EELSApiJsonConverter(FairdiParser):
     def parse(self, filepath, archive, logger=logger):
         with open(filepath) as f:
             file_data = json.load(f)
+        
         
         #Create a measurement in the archive
         measurement = archive.m_create(Measurement)
