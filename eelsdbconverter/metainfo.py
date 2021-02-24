@@ -79,8 +79,8 @@ class DataHeader(MSection):
 
 class Spectrum(MSection):
   n_values = Quantity(type=int)
-  energy = Quantity(type=np.dtype(np.float64), shape=['n_values'], unit='eV', description='This column contains the range of energies of the spectrum')
-  count = Quantity(type=np.dtype(np.float64), shape=['n_values'], unit=' ', description='The count at each energy value, dimensionless')
+  energy = Quantity(type=np.dtype(np.float64), shape=['n_values'], unit='J', description='The energy range of the spectrum')
+  count = Quantity(type=np.dtype(np.float64), shape=['n_values'], description='The count at each energy value, dimensionless')
 
 class Metadata(MSection):
     section_sample = SubSection(sub_section=Sample, repeats=True)
