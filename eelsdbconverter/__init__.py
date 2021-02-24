@@ -76,20 +76,27 @@ class EELSApiJsonConverter(FairdiParser):
                 if item[0].lower() == 'xunits':
                     if item[-1] != ':':
                         x_units = item[-1]
-                        print(x_units)
                     else:
-                        x_units = ' '
+                        x_units = 'eV'
 
             # Read the dataset from the msa file
             df = pd.read_csv(dataset_filepath,
                              header=None, skiprows=skip_row_counter,
-                             skipfooter=1, engine='python', sep="\t| |,")
+                             skipfooter=1, engine='python', sep=", | |,|\t")
 
             # Export the dataset to the archive
             ureg = nomad.units.ureg
 
             spectrum = data.m_create(Spectrum)
             spectrum.n_values = len(df)
+            try:
+                x_units
+            except NameError:
+                x_units = 'eV'
+                logger.info('WARNING!!! Manually set energy units to eV!')
+            if 'undefined' in x_units:
+                x_units = 'eV'
+                logger.info('WARNING!!! Manually set energy units to eV!')
             spectrum.energy = df[0].to_numpy() * ureg(x_units)
             spectrum.count = df[1].to_numpy()
 
