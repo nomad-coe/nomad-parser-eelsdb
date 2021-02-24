@@ -63,12 +63,21 @@ class Instrument(MSection):
 
 
 class AuthorGenerated(MSection):
-    permalink = Quantity(type=str)
     author_name = Quantity(type=str)
     author_profile_url = Quantity(type=str)
     author_profile_api_url = Quantity(type=str)
     description = Quantity(type=str)
     group_name = Quantity(type=str)
+
+
+class DataHeader(MSection):
+    # channel_id = Quantity(type=str)
+    label = Quantity(type=str)
+    unit = Quantity(type=str)
+
+
+class Origin(MSection):
+    permalink = Quantity(type=str)
     repository_name = Quantity(
         type=str, description='The name of the repository, where the data is stored.')
 
@@ -80,12 +89,6 @@ class AuthorGenerated(MSection):
 
     entry_repository_url = Quantity(
         type=str, description='An URL to the entry on the repository, where the data is stored.')
-
-
-class DataHeader(MSection):
-    # channel_id = Quantity(type=str)
-    label = Quantity(type=str)
-    unit = Quantity(type=str)
 
 
 class Spectrum(MSection):
@@ -100,6 +103,7 @@ class Metadata(MSection):
     section_instrument = SubSection(sub_section=Instrument, repeats=True)
     section_author_generated = SubSection(sub_section=AuthorGenerated, repeats=True)
     section_data_header = SubSection(sub_section=DataHeader, repeats=True)
+    section_origin = SubSection(sub_section=Origin, repeats=True)
 
 
 class Data(MSection):
