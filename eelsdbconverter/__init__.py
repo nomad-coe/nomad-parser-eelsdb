@@ -24,11 +24,11 @@ import numpy as np
 from datetime import datetime
 import logging
 import pandas as pd
-import nomad.units
+import glob
 
 from .metainfo import *
 from nomad.parsing.parser import FairdiParser
-
+from nomad.units import ureg
 
 logger = logging.getLogger(__name__)
 
@@ -49,29 +49,22 @@ class EELSApiJsonConverter(FairdiParser):
         # Create a measurement in the archive
         measurement = archive.m_create(Measurement)
 
-        """
-        Read (numerical) dataset into the measurement
-        """
-        # Check that the msa file exists
-
+        # Read (numerical) dataset into the measurement
+        # Read the msa file if it exists
         dirpath = os.path.dirname(filepath)
-        for i in os.listdir(dirpath):
-            if i.endswith('.msa'):
-                dataset_filepath = os.path.join(dirpath, i)
-
+        dataset_filepath = next(iter(glob.glob(os.path.join(dirpath, '*.msa'))), None)
         if dataset_filepath is not None:
             data = measurement.m_create(Data)
             # Read header of the dataset(msa file)
             with open(dataset_filepath, 'rt') as f:
                 line = f.readline()
-                skip_row_counter = 0
                 header_dataset = []
                 while line.startswith('#'):
                     header_dataset.append(line.strip().lstrip('#').split())
                     line = f.readline()
-                    skip_row_counter += 1
 
             # Extract units from the header of the dataset file
+            x_units = None
             for item in header_dataset:
                 if item[0].lower() == 'xunits':
                     if item[-1] != ':':
@@ -81,28 +74,22 @@ class EELSApiJsonConverter(FairdiParser):
 
             # Read the dataset from the msa file
             df = pd.read_csv(dataset_filepath,
-                             header=None, skiprows=skip_row_counter,
-                             skipfooter=1, engine='python', sep=", | |,|\t")
+                             header=None, comment='#',
+                             skipfooter=1, engine='python', sep=', | |,|\t')
 
             # Export the dataset to the archive
-            ureg = nomad.units.ureg
-
             spectrum = data.m_create(Spectrum)
             spectrum.n_values = len(df)
-            try:
-                x_units
-            except NameError:
+
+            if x_units is None or 'undefined' in x_units:
                 x_units = 'eV'
-                logger.info('WARNING!!! Manually set energy units to eV!')
-            if 'undefined' in x_units:
-                x_units = 'eV'
-                logger.info('WARNING!!! Manually set energy units to eV!')
+                logger.warn('Unknown energy units; assuming eV by default')
             spectrum.energy = df[0].to_numpy() * ureg(x_units)
             spectrum.count = df[1].to_numpy()
+        else:
+            logger.warn('No dataset (*.msa) file found in the current directory')
 
-        """
-        Create metadata schematic and import values
-        """
+        # Create metadata schematic and import values
         metadata = measurement.m_create(Metadata)
 
         # Load entries into each heading
@@ -130,6 +117,7 @@ class EELSApiJsonConverter(FairdiParser):
             if isinstance(edges, str):
                 edges = json.loads(edges)
             experiment.edges = edges
+        experiment.description = file_data['description']
 
         # Instrument
         instrument = metadata.m_create(Instrument)
@@ -151,13 +139,6 @@ class EELSApiJsonConverter(FairdiParser):
         device_settings.detector_type = file_data['detector']
         device_settings.dark_current = file_data['darkcurrent']
 
-        # Author Generated
-        author_generated = metadata.m_create(AuthorGenerated)
-        author_generated.author_name = file_data['author']['name']
-        author_generated.author_profile_url = file_data['author']['profile_url']
-        author_generated.author_profile_api_url = file_data['author']['profile_api_url']
-        author_generated.descriptionn = file_data['description']
-
         # Origin
         origin = metadata.m_create(Origin)
         origin.permalink = file_data['permalink']
@@ -170,3 +151,9 @@ class EELSApiJsonConverter(FairdiParser):
             origin.preview_url = file_data['preview_url']
         if file_data.get('entry_repository_url') is not None:
             origin.entry_repository_url = file_data['entry_repository_url']
+
+        # Author
+        author = origin.m_create(Author)
+        author.author_name = file_data['author']['name']
+        author.author_profile_url = file_data['author']['profile_url']
+        author.author_profile_api_url = file_data['author']['profile_api_url']
