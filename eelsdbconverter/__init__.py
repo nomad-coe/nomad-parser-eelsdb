@@ -25,6 +25,7 @@ from datetime import datetime
 import logging
 import pandas as pd
 import glob
+import re
 
 from .metainfo import *
 from nomad.parsing.parser import FairdiParser
@@ -55,22 +56,17 @@ class EELSApiJsonConverter(FairdiParser):
         dataset_filepath = next(iter(glob.glob(os.path.join(dirpath, '*.msa'))), None)
         if dataset_filepath is not None:
             data = measurement.m_create(Data)
-            # Read header of the dataset(msa file)
-            with open(dataset_filepath, 'rt') as f:
-                line = f.readline()
-                header_dataset = []
-                while line.startswith('#'):
-                    header_dataset.append(line.strip().lstrip('#').split())
-                    line = f.readline()
-
-            # Extract units from the header of the dataset file
             x_units = None
-            for item in header_dataset:
-                if item[0].lower() == 'xunits':
-                    if item[-1] != ':':
-                        x_units = item[-1]
-                    else:
-                        x_units = 'eV'
+            with open(dataset_filepath, 'rt') as f:
+                for line in f:
+                    match = re.search(r'#XUNITS(.*)', line)
+                    if match is not None:
+                        x_units = match.group().split()[-1]
+                        break
+
+            if x_units == ':' or 'undefined' in x_units.lower() or x_units is None:
+                x_units = 'eV'
+                logger.warn('Unknown energy units; assuming eV by default')
 
             # Read the dataset from the msa file
             df = pd.read_csv(dataset_filepath,
@@ -80,10 +76,6 @@ class EELSApiJsonConverter(FairdiParser):
             # Export the dataset to the archive
             spectrum = data.m_create(Spectrum)
             spectrum.n_values = len(df)
-
-            if x_units is None or 'undefined' in x_units:
-                x_units = 'eV'
-                logger.warn('Unknown energy units; assuming eV by default')
             spectrum.energy = df[0].to_numpy() * ureg(x_units)
             spectrum.count = df[1].to_numpy()
         else:
