@@ -36,4 +36,4 @@ def test_example(parser):
     measurement = archive.section_measurement[0]
     assert measurement.section_metadata[0].section_sample[0].sample_id is not None
     assert measurement.section_metadata[0].section_experiment[0].method_name is not None
-    assert measurement.section_data[0].section_spectrum[0].n_values == 216
+    assert measurement.section_data[0].section_spectrum[0].n_values == 226
