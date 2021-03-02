@@ -29,7 +29,8 @@ def main():
         license='APACHE 2.0',
         packages=find_packages(),
         install_requires=[
-            'nomad-lab'
+            'nomad-lab', 
+            'pandas'
         ],
     )
 
