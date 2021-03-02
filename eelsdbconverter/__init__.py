@@ -20,16 +20,17 @@
 import os.path
 import os
 import json
-import numpy as np
 from datetime import datetime
 import logging
-import pandas as pd
 import glob
 import re
+import numpy as np
 
 from .metainfo import *
 from nomad.parsing.parser import FairdiParser
 from nomad.units import ureg
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
