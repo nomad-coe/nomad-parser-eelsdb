@@ -26,11 +26,12 @@ import glob
 import re
 import numpy as np
 
-from .metainfo import *
 from nomad.parsing.parser import FairdiParser
 from nomad.units import ureg
 
 import pandas as pd
+
+from .metainfo import *
 
 logger = logging.getLogger(__name__)
 
