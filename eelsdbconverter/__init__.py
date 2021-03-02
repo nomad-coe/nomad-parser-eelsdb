@@ -68,7 +68,7 @@ class EELSApiJsonConverter(FairdiParser):
 
             if x_units == ':' or 'undefined' in x_units.lower() or x_units is None:
                 x_units = 'eV'
-                logger.warn('Unknown energy units; assuming eV by default')
+                logger.warning('Unknown energy units; assuming eV by default')
 
             # Read the dataset from the msa file
             df = pd.read_csv(dataset_filepath,
@@ -81,7 +81,7 @@ class EELSApiJsonConverter(FairdiParser):
             spectrum.energy = df[0].to_numpy() * ureg(x_units)
             spectrum.count = df[1].to_numpy()
         else:
-            logger.warn('No dataset (*.msa) file found in the current directory')
+            logger.warning('No dataset (*.msa) file found in the current directory')
 
         # Create metadata schematic and import values
         metadata = measurement.m_create(Metadata)
