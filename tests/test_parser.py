@@ -31,7 +31,7 @@ def parser():
 
 def test_example(parser):
     archive = EntryArchive()
-    parser.run('tests/Test1/metadata.json', archive, logging)
+    parser.parse('tests/Test1/metadata.json', archive, logging)
 
     measurement = archive.section_measurement[0]
     assert len(measurement.section_metadata.section_sample.sample_id) == 1
