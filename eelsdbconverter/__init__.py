@@ -114,6 +114,7 @@ class EELSApiJsonConverter(FairdiParser):
         experiment.description = file_data['description']
 
         # Instrument
+        # TODO: Add units to variables here
         instrument = metadata.m_create(Instrument)
         instrument.source_label = file_data['microscope']
         device_settings = instrument.m_create(DeviceSettings)
