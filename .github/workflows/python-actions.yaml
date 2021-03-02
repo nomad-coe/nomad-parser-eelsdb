@@ -19,13 +19,13 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: pycodestyle
       run: |
-        python -m pycodestyle --ignore=E501,E701,E731 *eels tests
+        python -m pycodestyle --ignore=E501,E701,E731 eelsdbconverter tests
     - name: pylint
       run: |
-        python -m pylint --load-plugins=nomad/metainfo/pylint_plugin *eels tests
+        python -m pylint --load-plugins=nomad/metainfo/pylint_plugin eelsdbconverter tests
     - name: mypy
       run: |
-        python -m mypy --ignore-missing-imports --follow-imports=silent --no-strict-optional *eels tests
+        python -m mypy --ignore-missing-imports --follow-imports=silent --no-strict-optional eelsdbconverter tests
     - name: Test with pytest
       run: |
         pytest -sv tests
