@@ -19,9 +19,16 @@
 import pytest
 import logging
 
-from nomad.datamodel import EntryArchive
+from nomad import utils
+from nomad.datamodel import EntryArchive, EntryMetadata
+from nomad.datamodel.ems import EMSMetadata
 
 from eelsdbconverter import EELSApiJsonConverter
+
+
+@pytest.fixture(scope='session', autouse=True)
+def nomad_logging():
+    utils.set_console_log_level(logging.ERROR)
 
 
 @pytest.fixture
@@ -29,11 +36,26 @@ def parser():
     return EELSApiJsonConverter()
 
 
-def test_example(parser):
+@pytest.mark.parametrize('path, n_values', [
+    ('tests/test_1/metadata.json', 226),
+    ('tests/test_2/metadata.json', 546),
+    ('tests/all.json', None)
+])
+def test_example(parser, path, n_values):
     archive = EntryArchive()
-    parser.parse('tests/Test1/metadata.json', archive, logging)
+    parser.parse(path, archive, utils.get_logger(__name__))
 
     measurement = archive.section_measurement[0]
-    assert measurement.section_metadata[0].section_sample[0].sample_id is not None
-    assert measurement.section_metadata[0].section_experiment[0].method_name is not None
-    assert measurement.section_data[0].section_spectrum[0].n_values == 226
+    assert measurement.section_metadata.section_sample.sample_id is not None
+    assert measurement.section_metadata.section_experiment.method_name is not None
+    if n_values is None:
+        assert measurement.section_data is None
+    else:
+        assert measurement.section_data.section_spectrum.n_values == n_values
+
+    entry_metadata = archive.m_create(EntryMetadata)
+    ems = entry_metadata.m_create(EMSMetadata)
+    ems.apply_domain_metadata(archive)
+
+    import json
+    print('###', json.dumps(entry_metadata.m_to_dict(), indent=2))

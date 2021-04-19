@@ -25,13 +25,19 @@ import logging
 import glob
 import re
 import numpy as np
+import pandas as pd
 
 from nomad.parsing.parser import FairdiParser
 from nomad.units import ureg
+from nomad.datamodel.metainfo.common_experimental import (
+    Measurement,
+    Metadata,
+    Sample,
+    Experiment,
+    Instrument, DeviceSettings,
+    Origin, Author,
+    Data, Spectrum)
 
-import pandas as pd
-
-from .metainfo import *
 
 logger = logging.getLogger(__name__)
 
