@@ -27,22 +27,23 @@ import re
 import numpy as np
 import pandas as pd
 
-from nomad.parsing.parser import FairdiParser
+from nomad.parsing.parser import MatchingParser
 from nomad.units import ureg
 from nomad.datamodel.metainfo.common_experimental import (
     Measurement,
     Metadata,
-    Sample,
+    Sample, SampleMaterial,
     Experiment,
     Instrument, DeviceSettings,
     Origin, Author,
     Data, Spectrum)
+from nomad.datamodel import Author as MetadataAuthor
 
 
 logger = logging.getLogger(__name__)
 
 
-class EELSApiJsonConverter(FairdiParser):
+class EELSApiJsonConverter(MatchingParser):
     def __init__(self):
         super().__init__(
             name='parsers/eels', code_name='eels', code_homepage='https://eelsdb.eu/',
@@ -95,16 +96,17 @@ class EELSApiJsonConverter(FairdiParser):
         # Load entries into each heading
         # Sample
         sample = metadata.m_create(Sample)
+        sample_material = sample.m_create(SampleMaterial)
 
-        sample.formula = file_data['formula']
         sample.sample_id = str(file_data['id'])
         sample.sample_title = file_data['title']
+        sample_material.formula = file_data['formula']
 
         elements = file_data.get('elements')
         if elements is not None:
             if isinstance(elements, str):
                 elements = json.loads(elements)
-            sample.elements = elements
+            sample_material.elements = elements
 
         # Experiment
         experiment = metadata.m_create(Experiment)
@@ -142,19 +144,42 @@ class EELSApiJsonConverter(FairdiParser):
 
         # Origin
         origin = metadata.m_create(Origin)
-        origin.permalink = file_data['permalink']
-        origin.api_permalink = file_data['api_permalink']
-        if file_data.get('repository_name') is not None:
-            origin.repository_name = file_data['repository_name']
-        if file_data.get('repository_url') is not None:
-            origin.repository_url = file_data['repository_url']
-        if file_data.get('preview_url') is not None:
-            origin.preview_url = file_data['preview_url']
-        if file_data.get('entry_repository_url') is not None:
-            origin.entry_repository_url = file_data['entry_repository_url']
+        origin.permalink = file_data.get('permalink')
+        origin.api_permalink = file_data.get('api_permalink')
+        origin.repository_name = 'Electron Energy Loss Spectroscopy (EELS) database'
+        origin.repository_url = 'https://eelsdb.eu'
+        origin.entry_repository_url = file_data.get('permalink')
 
         # Author
         author = origin.m_create(Author)
         author.author_name = file_data['author']['name']
         author.author_profile_url = file_data['author']['profile_url']
         author.author_profile_api_url = file_data['author']['profile_api_url']
+
+        # Search metadata
+        archive.section_metadata.external_id = str(file_data.get('id'))
+        archive.section_metadata.external_db = 'EELSDB'
+
+        author = file_data.get('author')['name']
+        author = re.sub(r'\(.*\)', '', author).strip()
+        archive.section_metadata.coauthors = [MetadataAuthor(
+            first_name=' '.join(author.split(' ')[0:-1]),
+            last_name=author.split(' ')[-1])]
+        archive.section_metadata.comment = file_data.get('description')
+        archive.section_metadata.references = [
+            file_data.get('permalink'),
+            file_data.get('api_permalink'),
+            file_data.get('download_link')]
+
+        reference = file_data.get('reference')
+        if reference:
+            if isinstance(reference, str):
+                archive.section_metadata.references.append(reference)
+            elif isinstance(reference, dict):
+                if 'freetext' in reference:
+                    archive.section_metadata.references.append(
+                        re.sub(r'\r+\n+', '; ', reference['freetext']))
+                else:
+                    archive.section_metadata.references.append('; '.join([
+                        str(value).strip() for value in reference.values()
+                    ]))

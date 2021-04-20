@@ -18,6 +18,7 @@
 
 import pytest
 import logging
+import os.path
 
 from nomad import utils
 from nomad.datamodel import EntryArchive, EntryMetadata
@@ -37,13 +38,18 @@ def parser():
 
 
 @pytest.mark.parametrize('path, n_values', [
-    ('tests/test_1/metadata.json', 226),
-    ('tests/test_2/metadata.json', 546),
-    ('tests/all.json', None)
+    ('data/test_1/metadata.json', 226),
+    ('data/test_2/metadata.json', 546),
+    ('data/all.json', None)
 ])
 def test_example(parser, path, n_values):
     archive = EntryArchive()
-    parser.parse(path, archive, utils.get_logger(__name__))
+    entry_metadata = archive.m_create(EntryMetadata)
+    ems = entry_metadata.m_create(EMSMetadata)
+
+    parser.parse(
+        os.path.join(os.path.dirname(__file__), path),
+        archive, utils.get_logger(__name__))
 
     measurement = archive.section_measurement[0]
     assert measurement.section_metadata.section_sample.sample_id is not None
@@ -53,9 +59,10 @@ def test_example(parser, path, n_values):
     else:
         assert measurement.section_data.section_spectrum.n_values == n_values
 
-    entry_metadata = archive.m_create(EntryMetadata)
-    ems = entry_metadata.m_create(EMSMetadata)
     ems.apply_domain_metadata(archive)
 
+    assert archive.section_metadata.formula is not None
+    assert len(archive.section_metadata.atoms) > 0
+
     import json
-    print('###', json.dumps(entry_metadata.m_to_dict(), indent=2))
+    print(json.dumps(archive.section_metadata.m_to_dict(), indent=2))
