@@ -19,21 +19,32 @@
 import pytest
 import logging
 
-from nomad.datamodel import EntryArchive
+from nomad.datamodel import EntryArchive, EntryMetadata
 
-from eelsdbconverter import EELSApiJsonConverter
+from eelsdbparser import EELSDBParser
 
 
 @pytest.fixture
 def parser():
-    return EELSApiJsonConverter()
+    return EELSDBParser()
 
 
-def test_example(parser):
+@pytest.mark.parametrize('mainfile, n_values', [
+    ('test_1/metadata.json', 226),
+    ('test_2/metadata.json', 546)
+])
+def test_examples(parser, mainfile, n_values):
     archive = EntryArchive()
-    parser.parse('tests/Test1/metadata.json', archive, logging)
+    archive.m_create(EntryMetadata)
+    parser.parse(f'tests/data/{mainfile}', archive, logging)
 
     measurement = archive.section_measurement[0]
-    assert measurement.section_metadata[0].section_sample[0].sample_id is not None
-    assert measurement.section_metadata[0].section_experiment[0].method_name is not None
-    assert measurement.section_data[0].section_spectrum[0].n_values == 226
+    assert measurement.section_metadata.section_experiment.experiment_id is not None
+    assert measurement.section_metadata.section_experiment.method_name is not None
+    assert measurement.section_data.section_spectrum.n_values == n_values
+
+
+def test_all_metadata_example(parser):
+    archive = EntryArchive()
+    archive.m_create(EntryMetadata)
+    parser.parse(f'tests/data/all_metadata.json', archive, logging)

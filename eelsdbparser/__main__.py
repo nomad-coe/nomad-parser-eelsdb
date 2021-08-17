@@ -21,8 +21,8 @@ import sys
 import json
 
 
-from eelsdbconverter import EELSApiJsonConverter
+from eelsdbparser import EELSDBParser
 
 if __name__ == "__main__":
-    archive = EELSApiJsonConverter.main(sys.argv[1])
+    archive = EELSDBParser.main(sys.argv[1])
     print(json.dumps(archive.m_to_dict(), indent=2))
