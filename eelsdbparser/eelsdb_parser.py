@@ -46,9 +46,10 @@ class EELSDBParser(MatchingParser):
             mainfile_contents_re=(r'https://eelsdb.eu/spectra')
         )
 
-    def parse_msa_file(self, msa_path, logger=logger):
+    def parse_msa_file(self, msa_path, logger):
         metadata_re = re.compile(r'^#\s*([A-Z0-9]+)\s*:(.*)\s*$')
-        data_re = re.compile(r'(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)')
+        number_re = r'-?\d+(\.\d+)?(e[\+\-]?\d+)?'
+        data_re = re.compile(f'({number_re}),\\s*({number_re})')
 
         raw_metadata = {}
         raw_energies = []
@@ -62,7 +63,7 @@ class EELSDBParser(MatchingParser):
                 match = re.match(data_re, line)
                 if match:
                     raw_energies.append(float(match.group(1)))
-                    raw_counts.append(float(match.group(3)))
+                    raw_counts.append(float(match.group(4)))
                     continue
 
                 logger.warning('Unexpected line format in .msa file')
@@ -94,7 +95,7 @@ class EELSDBParser(MatchingParser):
         msa_path = next(iter(
             glob.glob(os.path.join(os.path.dirname(mainfile_path), '*.msa'))), None)
         if msa_path:
-            _, spectrum = self.parse_msa_file(msa_path)
+            _, spectrum = self.parse_msa_file(msa_path, logger=logger)
             measurement.section_data.section_spectrum = spectrum
         else:
             logger.warning('No *.msa file found')

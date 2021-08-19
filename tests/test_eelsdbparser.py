@@ -31,7 +31,8 @@ def parser():
 
 @pytest.mark.parametrize('mainfile, n_values', [
     ('test_1/metadata.json', 226),
-    ('test_2/metadata.json', 546)
+    ('test_2/metadata.json', 546),
+    ('test_3/metadata.json', 1340)
 ])
 def test_examples(parser, mainfile, n_values):
     archive = EntryArchive()
