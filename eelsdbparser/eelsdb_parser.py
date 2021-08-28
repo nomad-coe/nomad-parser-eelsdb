@@ -119,7 +119,7 @@ class EELSDBParser(MatchingParser):
         # Experiment
         experiment = metadata.m_create(Experiment)
         experiment.experiment_id = str(raw_metadata['id'])
-        archive.section_metadata.external_id = str(raw_metadata['id'])
+        archive.metadata.external_id = str(raw_metadata['id'])
         experiment.method_name = 'electron energy loss spectroscopy'
         experiment.method_abbreviation = 'EELS'
         experiment.experiment_publish_time = datetime.strptime(
