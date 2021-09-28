@@ -27,9 +27,9 @@ def main():
         description='NOMAD converter/parser for metadata from EELS database',  # change accordingly
         author='Markus Scheidgen',  # add your names
         license='APACHE 2.0',
-        packages=find_packages(),
+        packages=find_packages(exclude=['tests']),
         install_requires=[
-            'nomad-lab', 
+            'nomad-lab',
             'pandas'
         ],
     )
