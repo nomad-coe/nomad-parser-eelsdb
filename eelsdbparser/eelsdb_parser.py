@@ -136,13 +136,20 @@ class EELSDBParser(MatchingParser):
         instrument.source_label = raw_metadata['microscope']
         device_settings = instrument.m_create(DeviceSettings)
         device_settings.device_name = raw_metadata['microscope']
-        device_settings.max_energy = raw_metadata['max_energy']
-        if raw_metadata.get('min_energy') is not None:
-            device_settings.min_energy = raw_metadata['min_energy']
+        max_energy_string = raw_metadata.get('max_energy')
+        if max_energy_string is not None:
+            value, unit = max_energy_string.split()
+            device_settings.max_energy = float(value) * ureg(unit)
+        min_energy_string = raw_metadata.get('min_energy')
+        if min_energy_string is not None:
+            value, unit = min_energy_string.split()
+            device_settings.min_energy = float(value) * ureg(unit)
+        resolution_string = raw_metadata.get('resolution')
+        if resolution_string is not None:
+            value, unit = resolution_string.split()
+            device_settings.resolution = float(value) * ureg(unit)
         device_settings.guntype = raw_metadata['guntype']
         device_settings.beam_energy = raw_metadata['beamenergy']
-        if raw_metadata.get('resolution') is not None:
-            device_settings.resolution = raw_metadata['resolution']
         device_settings.step_size = raw_metadata['stepSize']
         if raw_metadata.get('acquisition_mode') is not None:
             device_settings.acquisition_mode = raw_metadata['acquisition_mode']
