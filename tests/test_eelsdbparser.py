@@ -39,10 +39,10 @@ def test_examples(parser, mainfile, n_values):
     archive.m_create(EntryMetadata)
     parser.parse(f'tests/data/{mainfile}', archive, logging)
 
-    measurement = archive.section_measurement[0]
-    assert measurement.section_metadata.section_experiment.experiment_id is not None
-    assert measurement.section_metadata.section_experiment.method_name is not None
-    assert measurement.section_data.section_spectrum.n_values == n_values
+    measurement = archive.measurement[0]
+    assert measurement.measurement_id is not None
+    assert measurement.method_name is not None
+    assert measurement.eels.spectrum.n_values == n_values
 
 
 def test_all_metadata_example(parser):
