@@ -33,7 +33,7 @@ def main():
             'pandas'
         ],
         include_package_data=True,
-        package_data={'': ['metadata.yaml']},
+        package_data={'': ['*/*.yaml']},
     )
 
 
