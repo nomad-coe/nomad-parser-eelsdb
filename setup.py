@@ -33,7 +33,7 @@ def main():
             'pandas'
         ],
         include_package_data=True,
-        package_data={'': ['*/*.yaml']},
+        package_data={'eelsdbparser': ['metadata.yaml']},
     )
 
 
