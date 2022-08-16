@@ -32,6 +32,8 @@ def main():
             'nomad-lab',
             'pandas'
         ],
+        include_package_data=True,
+        package_data={'': ['metadata.yaml']},
     )
 
 
