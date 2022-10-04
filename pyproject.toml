@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = 'eelsdbconverter'
+version = '1.0'
+description = 'NOMAD converter/parser for metadata from EELS database.'
+readme = "README.md"
+authors = [{ name = "Markus Scheidgen" }]
+license = { file = "LICENSE" }
+dependencies = [
+    # "nomad-lab[infrastrucutre]",
+    "pandas"
+]
+
+[project.urls]
+homepage = "https://github.com/nomad-coe/database-parsers"
+
+[project.optional-dependencies]
+tests = [
+    'mypy==0.730',
+    'pylint==2.3.1',
+    'pylint_plugin_utils==0.5',
+    'pycodestyle',
+    'pytest==3.10.0',
+    'pytest-timeout',
+    'pytest-cov==2.7.1',
+]
+
+[tool.setuptools.packages.find]
+include = [
+    "eelsdbconverter*",
+]
+
+[tool.setuptools.package-data]
+eelsdbconverter = ['metadata.yaml']
