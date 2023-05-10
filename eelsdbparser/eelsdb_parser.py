@@ -74,17 +74,17 @@ class EELSInstrument(MSection):
 
 
 class EELSProperty(MSection):
-    detector_type = EELSInstrument.detector_type.m_copy(es_annotation=[
+    detector_type = EELSInstrument.detector_type.m_copy(a_elasticsearch=[
         Elasticsearch(material_entry_type),
         Elasticsearch(suggestion="default")
     ])
-    resolution = EELSInstrument.resolution.m_copy(es_annotation=[
+    resolution = EELSInstrument.resolution.m_copy(a_elasticsearch=[
         Elasticsearch(material_entry_type),
     ])
-    max_energy = EELSInstrument.max_energy.m_copy(es_annotation=[
+    max_energy = EELSInstrument.max_energy.m_copy(a_elasticsearch=[
         Elasticsearch(material_entry_type),
     ])
-    min_energy = EELSInstrument.min_energy.m_copy(es_annotation=[
+    min_energy = EELSInstrument.min_energy.m_copy(a_elasticsearch=[
         Elasticsearch(material_entry_type),
     ])
 
