@@ -24,21 +24,17 @@ from datetime import datetime
 import logging
 import glob
 import re
-import numpy as np
 
 from nomad.datamodel import EntryArchive
-from nomad.datamodel.results import Material
 from nomad.metainfo.metainfo import SubSection
 from nomad.parsing.parser import MatchingParser
 from nomad.units import ureg
 from nomad.metainfo import MSection, Section, Quantity, Datetime, Package
-from nomad.metainfo.elasticsearch_extension import Elasticsearch, material_entry_type
 
 from nomad.datamodel.metainfo.measurements import (
     Measurement, Sample, Instrument, Spectrum)
 from nomad.datamodel import Author
-from nomad.datamodel.results import (
-    Results, Method, Properties, SpectroscopyProperties)
+from nomad.datamodel.results import EELSInstrument
 
 
 default_logger = logging.getLogger(__name__)
@@ -57,38 +53,6 @@ class EELSMeasurement(MSection):
     authors = SubSection(section_def=Author, repreats=True)
 
 
-class EELSInstrument(MSection):
-    # m_def = Section(parents=[
-    #     ParentSection(name='eels', section_def=Instrument)])
-
-    max_energy = Quantity(type=np.dtype(np.float64), unit="joule")
-    min_energy = Quantity(type=np.dtype(np.float64), unit="joule")
-    guntype = Quantity(type=str)
-    beam_energy = Quantity(type=str)
-    resolution = Quantity(type=np.dtype(np.float64), unit="joule")
-    step_size = Quantity(type=str)
-    acquisition_mode = Quantity(type=str)
-    beam_current = Quantity(type=str)
-    detector_type = Quantity(type=str)
-    dark_current = Quantity(type=str)
-
-
-class EELSProperty(MSection):
-    detector_type = EELSInstrument.detector_type.m_copy(a_elasticsearch=[
-        Elasticsearch(material_entry_type),
-        Elasticsearch(suggestion="default")
-    ])
-    resolution = EELSInstrument.resolution.m_copy(a_elasticsearch=[
-        Elasticsearch(material_entry_type),
-    ])
-    max_energy = EELSInstrument.max_energy.m_copy(a_elasticsearch=[
-        Elasticsearch(material_entry_type),
-    ])
-    min_energy = EELSInstrument.min_energy.m_copy(a_elasticsearch=[
-        Elasticsearch(material_entry_type),
-    ])
-
-
 # TODO replace with ParentSection once this is implement in the metainfo
 class MyMeasurement(Measurement):
     m_def = Section(extends_base_section=True)
@@ -98,13 +62,6 @@ class MyMeasurement(Measurement):
 class MyInstrument(Instrument):
     m_def = Section(extends_base_section=True)
     eels = SubSection(section_def=EELSInstrument)
-
-
-class MySpectroscopyProperties(SpectroscopyProperties):
-    m_def = Section(extends_base_section=True)
-    eels = SubSection(
-        sub_section=EELSProperty,
-        a_elasticsearch=Elasticsearch(material_entry_type, nested=True))
 
 
 m_package.__init_metainfo__()
@@ -218,14 +175,17 @@ class EELSDBParser(MatchingParser):
             value, unit = resolution_string.split()
             instrument.eels.resolution = float(value) * ureg(unit)
         instrument.eels.guntype = raw_metadata['guntype']
-        instrument.eels.beam_energy = raw_metadata['beamenergy']
+        if raw_metadata.get('beamenergy') is not None:
+            value, unit = raw_metadata.get('beamenergy').split()
+            instrument.eels.beam_energy = float(value) * ureg(unit)
         instrument.eels.step_size = raw_metadata['stepSize']
         if raw_metadata.get('acquisition_mode') is not None:
             instrument.eels.acquisition_mode = raw_metadata['acquisition_mode']
         if raw_metadata.get('beamcurrent') is not None:
             instrument.eels.beam_current = raw_metadata['beamcurrent']
         instrument.eels.detector_type = raw_metadata['detector']
-        instrument.eels.dark_current = raw_metadata['darkcurrent']
+        if raw_metadata.get('darkcurrent') is not None:
+            instrument.eels.dark_current = raw_metadata.get('darkcurrent') == 'Yes'
 
         # Origin
         archive.metadata.external_db = 'EELS Data Base'
@@ -244,30 +204,3 @@ class EELSDBParser(MatchingParser):
         archive.metadata.entry_coauthors = [author]
         # author.author_profile_url = raw_metadata['author']['profile_url']
         # author.author_profile_api_url = raw_metadata['author']['profile_api_url']
-
-        # Results
-        if archive.results is None:
-            archive.results = Results()
-        results = archive.results
-
-        if results.material is None:
-            results.material = Material()
-        results.material.elements = sample.elements
-        results.material.chemical_formula_descriptive = sample.chemical_formula
-
-        if results.method is None:
-            results.m_create(Method)
-        results.method.method_name = 'EELS'
-
-        if measurement.eels.spectrum:
-            if results.properties is None:
-                properties = results.m_create(Properties)
-            if results.properties.spectroscopy is None:
-                spectroscopy = properties.m_create(SpectroscopyProperties)
-
-            spectroscopy.spectrum = measurement.eels.spectrum
-            spectroscopy.eels = EELSProperty(
-                resolution=instrument.eels.resolution,
-                detector_type=instrument.eels.detector_type,
-                min_energy=instrument.eels.min_energy,
-                max_energy=instrument.eels.max_energy)
