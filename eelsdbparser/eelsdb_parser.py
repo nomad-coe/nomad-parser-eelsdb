@@ -29,10 +29,10 @@ from nomad.datamodel import EntryArchive
 from nomad.metainfo.metainfo import SubSection
 from nomad.parsing.parser import MatchingParser
 from nomad.units import ureg
-from nomad.metainfo import MSection, Section, Quantity, Datetime, Package
+from nomad.metainfo import Section, Package
 
 from nomad.datamodel.metainfo.measurements import (
-    Measurement, Sample, Instrument, Spectrum)
+    Measurement, Sample, Instrument, EELSMeasurement, Spectrum)
 from nomad.datamodel import Author
 from nomad.datamodel.results import EELSInstrument
 
@@ -40,17 +40,6 @@ from nomad.datamodel.results import EELSInstrument
 default_logger = logging.getLogger(__name__)
 
 m_package = Package(name='eels')
-
-
-class EELSMeasurement(MSection):
-    # m_def = Section(parents=[
-    #     ParentSection(name='eels', section_def=Measurement)])
-
-    spectrum = SubSection(section_def=Spectrum)
-    edges = Quantity(type=str, shape=['*'])
-    publish_time = Quantity(
-        type=Datetime, description='The datetime that this was published on EELS DB.')
-    authors = SubSection(section_def=Author, repreats=True)
 
 
 # TODO replace with ParentSection once this is implement in the metainfo
