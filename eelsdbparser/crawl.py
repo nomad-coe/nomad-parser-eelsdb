@@ -25,24 +25,21 @@ import os.path
 
 def download_eels(max: int = 1000):
     ''' Downloads all EELS data. '''
-    zf = zipfile.ZipFile('eels-data.zip', mode='x')
+    with zipfile.ZipFile('eels-data.zip', mode='x') as zf:
+        eelsdb = requests.get(f'https://api.eelsdb.eu/spectra?per_page={max}').json()
+        for entry in eelsdb:
+            print(f'add {entry["permalink"]}')
+            path = entry['permalink'].strip('https://').strip('/')
+            with zf.open(os.path.join(path, 'metadata.json'), mode='w') as f:
+                f.write(json.dumps(entry, indent=2).encode('utf-8'))
 
-    eelsdb = requests.get('https://api.eelsdb.eu/spectra?per_page=%d' % max).json()
-    for entry in eelsdb:
-        print('add %s' % entry['permalink'])
-        path = entry['permalink'].strip('https://').strip('/')
-        with zf.open(os.path.join(path, 'metadata.json'), mode='w') as f:
-            f.write(json.dumps(entry, indent=2).encode('utf-8'))
+            try:
+                data = requests.get(entry['download_link']).content
+                with zf.open(os.path.join(path, 'data.msa'), mode='w') as f:
+                    f.write(data)
 
-        try:
-            data = requests.get(entry['download_link']).content
-            with zf.open(os.path.join(path, 'data.msa'), mode='w') as f:
-                f.write(data)
-
-        except Exception:
-            print('Could not download spectra for %s' % entry['permalink'])
-
-    zf.close()
+            except Exception:
+                print(f'Could not download spectra for {entry["permalink"]}')
 
 
 if __name__ == '__main__':
