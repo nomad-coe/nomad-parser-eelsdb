@@ -26,7 +26,7 @@ jobs:
         pip install types-PyYAML
     - name: pycodestyle
       run: |
-        python -m pycodestyle --ignore=E501,E701,E731 *parsers tests
+        python -m pycodestyle --ignore=E501,E701,E731 eelsdbparser tests
     - name: pylint
       run: |
         python -m pylint eelsdbparser tests
