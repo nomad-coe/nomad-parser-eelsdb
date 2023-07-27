@@ -10,7 +10,8 @@ readme = "README.md"
 authors = [{ name = "The NOMAD Authors" }]
 license = { file = "LICENSE" }
 dependencies = [
-    "pandas"
+    "pandas",
+    "requests"
 ]
 
 [project.urls]
