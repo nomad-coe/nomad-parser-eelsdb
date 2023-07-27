@@ -26,7 +26,11 @@ import os.path
 def download_eels(max: int = 1000):
     ''' Downloads all EELS data. '''
     with zipfile.ZipFile('eels-data.zip', mode='x') as zf:
-        eelsdb = requests.get(f'https://api.eelsdb.eu/spectra?per_page={max}').json()
+        try:
+            eelsdb = requests.get(f'https://api.eelsdb.eu/spectra?per_page={max}').json()
+        except Exception as e:
+            raise Exception('Could not download spectras from EELSDB') from e
+
         for entry in eelsdb:
             print(f'add {entry["permalink"]}')
             path = entry['permalink'].strip('https://').strip('/')
