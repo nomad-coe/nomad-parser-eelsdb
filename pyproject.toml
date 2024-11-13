@@ -23,11 +23,11 @@ tests = [
     'pylint==2.13.9',
     'pylint_plugin_utils==0.5',
     'pycodestyle==2.8.0',
-    'pytest==3.10.0',
-    'pytest-timeout==1.4.2',
-    'pytest-cov==2.7.1',
-    'astroid==2.11.7',
-    'typing-extensions==4.4.0',
+    'pytest>=3.10.0',
+    'pytest-timeout>=1.4.2',
+    'pytest-cov>=2.7.1',
+    'astroid>=2.11.7',
+    'typing-extensions>=4.4.0',
     'types-requests'
 ]
 
