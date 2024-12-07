@@ -21,7 +21,7 @@ import sys
 import json
 
 
-from eelsdbparser import EELSDBParser
+from eelsdbparser.eelsdb_parser import EELSDBParser
 
 if __name__ == "__main__":
     archive = EELSDBParser.main(sys.argv[1])

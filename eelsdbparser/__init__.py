@@ -16,5 +16,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from nomad.config.models.plugins import ParserEntryPoint
 
-from eelsdbparser.eelsdb_parser import EELSDBParser
+
+class EntryPoint(ParserEntryPoint):
+
+    def load(self):
+        from eelsdbparser.eelsdb_parser import EELSDBParser
+
+        return EELSDBParser()
+
+
+eelsdb_parser_entry_point = EntryPoint(
+    name='parsers/eels',
+    aliases=['parsers/eels'],
+    description='NOMAD parser for EELSDB.',
+)

@@ -10,6 +10,7 @@ readme = "README.md"
 authors = [{ name = "The NOMAD Authors" }]
 license = { file = "LICENSE" }
 dependencies = [
+    "nomad-lab>=1.3.6",
     "pandas",
     "requests"
 ]
@@ -32,7 +33,7 @@ tests = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["eelsdbconverter*"]
+include = ["eelsdbparser*"]
 
-[tool.setuptools.package-data]
-eelsdbconverter = ['metadata.yaml']
+[project.entry-points.'nomad.plugin']
+eelsdbparser = "eelsdbparser:eelsdb_parser_entry_point"

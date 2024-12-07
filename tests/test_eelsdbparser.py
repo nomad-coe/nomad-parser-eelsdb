@@ -21,7 +21,7 @@ import logging
 
 from nomad.datamodel import EntryArchive, EntryMetadata
 
-from eelsdbparser import EELSDBParser
+from eelsdbparser.eelsdb_parser import EELSDBParser
 
 
 @pytest.fixture
@@ -48,4 +48,4 @@ def test_examples(parser, mainfile, n_values):
 def test_all_metadata_example(parser):
     archive = EntryArchive()
     archive.m_create(EntryMetadata)
-    parser.parse(f'tests/data/all_metadata.json', archive, logging)
+    parser.parse('tests/data/all_metadata.json', archive, logging)
